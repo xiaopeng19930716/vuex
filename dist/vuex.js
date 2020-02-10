@@ -1,13 +1,13 @@
 /**
  * vuex v3.1.2
- * (c) 2019 Evan You
+ * (c) 2020 Evan You
  * @license MIT
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global.Vuex = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   function applyMixin (Vue) {
     var version = Number(Vue.version.split('.')[0]);
@@ -398,9 +398,13 @@
         handler(payload);
       });
     });
-    this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
+
+    this._subscribers
+      .slice() // shallow copy to prevent iterator invalidation if subscriber synchronously calls unsubscribe
+      .forEach(function (sub) { return sub(mutation, this$1.state); });
 
     if (
+      
       options && options.silent
     ) {
       console.warn(
@@ -429,6 +433,7 @@
 
     try {
       this._actionSubscribers
+        .slice() // shallow copy to prevent iterator invalidation if subscriber synchronously calls unsubscribe
         .filter(function (sub) { return sub.before; })
         .forEach(function (sub) { return sub.before(action, this$1.state); });
     } catch (e) {
@@ -671,7 +676,7 @@
 
         if (!options || !options.root) {
           type = namespace + type;
-          if (!store._actions[type]) {
+          if ( !store._actions[type]) {
             console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
             return
           }
@@ -688,7 +693,7 @@
 
         if (!options || !options.root) {
           type = namespace + type;
-          if (!store._mutations[type]) {
+          if ( !store._mutations[type]) {
             console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
             return
           }
@@ -797,9 +802,7 @@
   }
 
   function getNestedState (state, path) {
-    return path.length
-      ? path.reduce(function (state, key) { return state[key]; }, state)
-      : state
+    return path.reduce(function (state, key) { return state[key]; }, state)
   }
 
   function unifyObjectStyle (type, payload, options) {
@@ -837,7 +840,7 @@
    */
   var mapState = normalizeNamespace(function (namespace, states) {
     var res = {};
-    if (!isValidMap(states)) {
+    if ( !isValidMap(states)) {
       console.error('[vuex] mapState: mapper parameter must be either an Array or an Object');
     }
     normalizeMap(states).forEach(function (ref) {
@@ -873,7 +876,7 @@
    */
   var mapMutations = normalizeNamespace(function (namespace, mutations) {
     var res = {};
-    if (!isValidMap(mutations)) {
+    if ( !isValidMap(mutations)) {
       console.error('[vuex] mapMutations: mapper parameter must be either an Array or an Object');
     }
     normalizeMap(mutations).forEach(function (ref) {
@@ -909,7 +912,7 @@
    */
   var mapGetters = normalizeNamespace(function (namespace, getters) {
     var res = {};
-    if (!isValidMap(getters)) {
+    if ( !isValidMap(getters)) {
       console.error('[vuex] mapGetters: mapper parameter must be either an Array or an Object');
     }
     normalizeMap(getters).forEach(function (ref) {
@@ -922,7 +925,7 @@
         if (namespace && !getModuleByNamespace(this.$store, 'mapGetters', namespace)) {
           return
         }
-        if (!(val in this.$store.getters)) {
+        if ( !(val in this.$store.getters)) {
           console.error(("[vuex] unknown getter: " + val));
           return
         }
@@ -942,7 +945,7 @@
    */
   var mapActions = normalizeNamespace(function (namespace, actions) {
     var res = {};
-    if (!isValidMap(actions)) {
+    if ( !isValidMap(actions)) {
       console.error('[vuex] mapActions: mapper parameter must be either an Array or an Object');
     }
     normalizeMap(actions).forEach(function (ref) {
@@ -1033,7 +1036,7 @@
    */
   function getModuleByNamespace (store, helper, namespace) {
     var module = store._modulesNamespaceMap[namespace];
-    if (!module) {
+    if ( !module) {
       console.error(("[vuex] module namespace not found in " + helper + "(): " + namespace));
     }
     return module
@@ -1052,4 +1055,4 @@
 
   return index;
 
-}));
+})));
